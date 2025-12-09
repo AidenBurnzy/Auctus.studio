@@ -1,52 +1,45 @@
 # animations
 
-## Connecting the contact form to Neon
+## Contact Form Setup (Netlify Forms)
 
-1. **Create a Neon project** – Log into [console.neon.tech](https://console.neon.tech), create a project, and note the auto-generated branch, database, and password.
-2. **Copy the connection string** – From the "Connection Details" panel, copy the `psql` connection string (it already includes `sslmode=require`). Paste it into `.env.local` or your dashboard secrets as `DATABASE_URL`.
-3. **Provision the table** – Run the SQL in `sql/contact_submissions.sql` from the Neon SQL editor or the CLI. You can also let the helper script handle this automatically (next step) if you prefer.
+The contact form uses **Netlify Forms** - a built-in feature that requires zero configuration for basic functionality.
 
-	```sql
-	CREATE TABLE IF NOT EXISTS contact_submissions (
-		 id SERIAL PRIMARY KEY,
-		 name VARCHAR(255) NOT NULL,
-		 email VARCHAR(255) NOT NULL,
-		 company VARCHAR(255) NOT NULL,
-		 phone VARCHAR(50) NOT NULL,
-		 service VARCHAR(255) NOT NULL,
-		 timeline VARCHAR(100) NOT NULL,
-		 message TEXT NOT NULL,
-		 submitted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-	);
-	```
+### How it Works
 
-4. **Configure environment variables** – Copy `.env.example` to `.env.local` (for local dev) or set the same values inside Vercel/Netlify:
+1. The form in `contact.html` includes the `data-netlify="true"` attribute
+2. When deployed to Netlify, forms are automatically detected and submissions are captured
+3. Netlify stores all submissions in your site's admin panel under **Forms**
 
-	```bash
-	cp .env.example .env.local
-	```
+### Email Notifications
 
-	Fill in:
+To receive email notifications when someone submits the form:
 
-	- `DATABASE_URL` – Neon connection string
-	- `RESEND_API_KEY` – Resend API key (or any SMTP provider you wire in)
-	- `RESEND_FROM_EMAIL` – Verified sender (Resend provides `onboarding@resend.dev` for testing)
-	- `RESEND_TO_EMAIL` – Inbox that should receive notifications
+1. Go to your Netlify site dashboard
+2. Navigate to **Site settings > Forms > Form notifications**
+3. Click **Add notification**
+4. Choose **Email notification**
+5. Enter the email address where you want to receive submissions (e.g., `founder.auctusventures@gmail.com`)
 
-5. **Verify the Neon connection** – After filling in `DATABASE_URL`, run the helper:
+### Spam Protection
 
-	```bash
-	npm install
-	npm run verify:neon
-	```
+Netlify includes built-in spam filtering. For additional protection, you can enable:
+- **reCAPTCHA** - in Site settings > Forms > Form detection
+- **Akismet** - Connect your Akismet API key in the same settings
 
-	Pass `-- --skip-insert` if you only want to ensure the table exists without performing a test insert/delete cycle.
+### Local Testing
 
-6. **Run locally** – Start the dev server. The API route will write to Neon automatically when `DATABASE_URL` is present.
+To test the form locally with Netlify CLI:
 
-	```bash
-	npm run dev
-	```
+```bash
+npm install -g netlify-cli
+netlify dev
+```
+
+This starts a local dev server with Netlify Forms emulation.
+
+### Previous Setup (Deprecated)
+
+The site previously used Resend.com via the `/api/submit-contact.js` serverless function. This has been replaced with Netlify Forms for simplicity. The API directory and Neon database integration are no longer needed for contact form functionality
 
 7. **Deploy** – Ensure the same environment variables exist in your hosting provider before deploying (`npm run deploy`).
 

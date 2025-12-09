@@ -1,0 +1,15 @@
+# Netlify configuration file
+
+[build]
+  publish = "."
+  command = "echo 'No build command needed for static site'"
+
+# Form notifications - configure your email in Netlify UI
+# Go to: Site settings > Forms > Form notifications
+# to set up email notifications for form submissions
+
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
+
+[build.environment]
+  NODE_VERSION = "18"

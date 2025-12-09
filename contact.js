@@ -33,57 +33,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const contactForm = document.getElementById('contactForm');
 
     if (contactForm) {
-        contactForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            // Get form data
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                company: document.getElementById('company').value,
-                phone: document.getElementById('phone').value,
-                service: document.getElementById('service').value,
-                timeline: document.getElementById('timeline').value,
-                message: document.getElementById('message').value
-            };
-
-            // Get submit button and disable it
+        contactForm.addEventListener('submit', (event) => {
+            // Get submit button and show loading state
             const submitBtn = contactForm.querySelector('.submit-btn');
-            const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span>Sending...</span>';
 
-            try {
-                // Send to API endpoint
-                const response = await fetch('/api/submit-contact', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
+            // Store confirmation timestamp for the confirmation page
+            sessionStorage.setItem('auctus-contact-confirmed', Date.now().toString());
 
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    // Success - store confirmation and redirect
-                    sessionStorage.setItem('auctus-contact-confirmed', Date.now().toString());
-                    contactForm.reset();
-                    window.location.href = 'contact-confirmation.html';
-                } else {
-                    // Error from API
-                    throw new Error(result.error || 'Failed to submit form');
-                }
-
-            } catch (error) {
-                console.error('Form submission error:', error);
-                
-                // Show error message to user
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-                
-                alert('Sorry, there was an error submitting your form. Please try again or email us directly at founder.auctusventures@gmail.com');
-            }
+            // Let the form submit naturally to Netlify
+            // Netlify will handle the submission and redirect to contact-confirmation.html
         });
     }
 
