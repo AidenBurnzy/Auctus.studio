@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (contactForm) {
         contactForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
             // Get submit button and show loading state
             const submitBtn = contactForm.querySelector('.submit-btn');
             submitBtn.disabled = true;
@@ -42,8 +44,24 @@ document.addEventListener('DOMContentLoaded', () => {
             // Store confirmation timestamp for the confirmation page
             sessionStorage.setItem('auctus-contact-confirmed', Date.now().toString());
 
-            // Let the form submit naturally to Netlify
-            // Netlify will handle the submission and redirect to contact-confirmation.html
+            // Submit form data to Netlify
+            const formData = new FormData(contactForm);
+            
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            })
+            .then(() => {
+                // Redirect to confirmation page on success
+                window.location.href = '/contact-confirmation.html';
+            })
+            .catch((error) => {
+                console.error('Form submission error:', error);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Launch The Introduction</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>';
+                alert('Sorry, there was an error submitting your form. Please try again or email us directly at founder.auctusventures@gmail.com');
+            });
         });
     }
 
